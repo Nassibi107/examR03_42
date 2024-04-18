@@ -6,13 +6,14 @@
 /*   By: ynassibi <ynassibi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/15 15:22:57 by ynassibi          #+#    #+#             */
-/*   Updated: 2024/04/15 15:56:48 by ynassibi         ###   ########.fr       */
+/*   Updated: 2024/04/18 12:12:31 by ynassibi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdarg.h>
-#include <sys/_types/_va_list.h>
+
 #include <unistd.h>
+#include <stdio.h>
 
 void  ft_iputstr(char c, int *b)
 {
@@ -26,7 +27,7 @@ void ft_putchar(char *s, int *b)
       (*b) += write(1, "(null)", 7);
    else
       while(s[i])
-         ft_iputstr(s[i], b);
+         ft_iputstr(s[i++], b);
 }
 void  ft_putnbr(int n, int *b)
 {
@@ -62,10 +63,49 @@ void  ft_puthex(unsigned int nb, int *b)
    }
 }
 
-int ft_printf(va_list va, char f)
+int ft_printflag(va_list va, char f)
 {
    int b = 0;
    if (f == 's')
-      ft_iputstr((va_arg(va , char )), &b);
+      ft_putchar(va_arg(va , char * ), &b);
+   else if (f == 'd')
+      ft_putnbr(va_arg(va , int), &b);
+   else if (f == 'x')
+      ft_puthex(va_arg(va ,unsigned int), &b);
+   else
+      ft_iputstr(f, &b);
    return (b);
 }
+int ft_printf(const char *format,...)
+{
+   int i =0;
+   int  b = 0;
+   va_list va;
+   va_start(va, format);
+   if (write(1,"",1) == -1)
+      return(-1);
+   while (format[i])
+   {
+      if (format[i] == '%')
+      {
+         if (!format[i + 1])
+            break;
+         b += ft_printflag(va, format[++i]);
+      }
+      else
+         b += write(1,&format[i],1);
+      i++;
+   }
+   va_end(va);
+   return (b);
+}
+
+// int main ()
+// {
+//    int a = 0;
+//    int b = 0;
+//    b= ft_printf("%s nassibi%d\n", "yassine",23);
+//    a = printf("%s nassibi%d\n", "yassine", 23);
+//    ft_printf("sys_[%d]\t ft_[%d]", a, b);
+
+// }
